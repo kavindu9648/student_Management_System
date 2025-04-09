@@ -4,7 +4,23 @@ import { supabase } from "@/lib/supabase";
 import toast, { Toast } from "react-hot-toast";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+
+interface Student {
+  id?: string;
+  name: string;
+  email: string;
+  phone_number: string;
+  gender: string;
+}
 export default function Home() {
+  const [students, setStudents] = useState<Student[]>([]);
+  const [form, setForm] = useState<Student>({
+    name: "",
+    email: "",
+    phone_number: "",
+    gender: "Male",
+  });
+
   return (
     <>
       {/*Student Management Form*/}
@@ -17,19 +33,21 @@ export default function Home() {
                 <form>
                   <div className="mb-3">
                     <label className="form-label">Name:</label>
-                    <input type="text" className="form-control" value="" />
+                    <input type="text" value={form.name} onChange={(event)=>setForm({
+                      ...form,name:event.target.value
+                    })} className="form-control"  />
                   </div>
                   <div className="mb-3">
                     <label>Email:</label>
-                    <input type="email" className="form-control" value="" />
+                    <input type="email" value={form.email} className="form-control"  />
                   </div>
                   <div className="mb-3">
                     <label>Phone Number:</label>
-                    <input type="text" className="form-control" value="" />
+                    <input type="text" value={form.phone_number} className="form-control"  />
                   </div>
                   <div className="mb-3">
                     <label>Gender:</label>
-                    <select className="form-select">
+                    <select className="form-select"value={form.gender }>
                       <option value="male">Male</option>
                       <option value="female">Female</option>
                       <option value="other">Other</option>
