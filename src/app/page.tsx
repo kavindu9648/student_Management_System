@@ -1,40 +1,54 @@
 "use client";
 import { useEffect, useState, FormEvent } from "react";
-import { supabase } from "@/app/lib/supabase";
+import { supabase } from "./lib/supabase";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
-
 interface Student {
-  id?: string;
+  id: string;
   name: string;
   email: string;
   phone_number: string;
   gender: string;
 }
 
+
 export default function Home() {
-  const [students , setStudents] = useState<Student[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
   const [form, setForm] = useState<Student>({
+    id: "",
     name: "",
     email: "",
     phone_number: "",
     gender: "Male",
   });
-  const [editId, setEditId] = useState<string | null>(null);
 
+  const [editId,setEditId] = useState<string | null>(null);
+  
   //Handle Form Submit
   async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     console.log(form);
-    const { error } = await supabase.from<Student>("students").insert([form]);
+    
+    const { error } = await supabase.from("students").insert([form]);
+    
     if (error) {
       toast.error(`Faild to create ${error.message}`);
     } else {
       toast.success("Student added successfully");
     }
+    //Live Update The Form
+    setForm({
+      id: "",
+      name: "",
+      email: "",
+      phone_number: "",
+      gender: "Male",
+    })
   }
+  //Fetch Students Data To Table
+  
 
   return (
     <>
@@ -47,6 +61,20 @@ export default function Home() {
             <div className="card mb-4">
               <div className="card-body">
                 <form onSubmit={handleFormSubmit}>
+                <div className="mb-3">
+                    <label className="form-label">Id:</label>
+                    <input
+                      type="text"
+                      value={form.id}
+                      onChange={(event) =>
+                        setForm({
+                          ...form,
+                          id: event.target.value,
+                        })
+                      }
+                      className="form-control"
+                    />
+                  </div>
                   <div className="mb-3">
                     <label className="form-label">Name:</label>
                     <input
@@ -117,6 +145,7 @@ export default function Home() {
               <table className="table table-bordered">
                 <thead className="table-light">
                   <tr>
+                    <th>Id</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
@@ -126,6 +155,7 @@ export default function Home() {
                 </thead>
                 <tbody>
                   <tr>
+                    <td>1</td>
                     <td>Kavindu Eranga</td>
                     <td>keranga297@gmail.com</td>
                     <td>0766723151</td>
