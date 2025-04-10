@@ -13,7 +13,6 @@ interface Student {
   gender: string;
 }
 
-
 export default function Home() {
   const [students, setStudents] = useState<Student[]>([]);
   const [form, setForm] = useState<Student>({
@@ -24,31 +23,88 @@ export default function Home() {
     gender: "Male",
   });
 
-  const [editId,setEditId] = useState<string | null>(null);
-  
+  const [editId, setEditId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
   //Handle Form Submit
   async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     console.log(form);
-    
-    const { error } = await supabase.from("students").insert([form]);
-    
-    if (error) {
-      toast.error(`Faild to create ${error.message}`);
+
+    if (editId) {
+      //Update
+      const { error } = await supabase
+        .from("students")
+        .update(form)
+        .eq("id", editId);
+      if (error) {
+        toast.error(`Failed to update Student`);
+      } else {
+        toast.success(`Student updated successfully`);
+        fetchStudents();
+      }
     } else {
-      toast.success("Student added successfully");
+      //Add
+      const { error } = await supabase.from("students").insert([form]);
+
+      if (error) {
+        toast.error(`Faild to create ${error.message}`);
+      } else {
+        toast.success("Student added successfully");
+      }
+      //Live Update The Form
+      setForm({
+        id: "",
+        name: "",
+        email: "",
+        phone_number: "",
+        gender: "Male",
+      });
     }
-    //Live Update The Form
-    setForm({
-      id: "",
-      name: "",
-      email: "",
-      phone_number: "",
-      gender: "Male",
-    })
   }
+
   //Fetch Students Data To Table
-  
+  async function fetchStudents() {
+    const { data, error } = await supabase.from("students").select("*");
+    if (error) {
+      toast.error(`Failed to fetch students ${error.message}`);
+    } else {
+      console.log(data);
+      setStudents(data || []);
+    }
+  }
+  //Handle Student Edit
+  function handleStudentEdit(student: Student) {
+    setForm(student);
+    if (student.id) {
+      setEditId(student.id);
+    }
+  }
+
+  //Handle Student Delete
+  async function handleStudentDelete(id: string) {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+    if (result.isConfirmed) {
+      const { error } = await supabase.from("students").delete().eq("id", id);
+      if (error) {
+        toast.error(`Failed to delete student.`);
+      } else {
+        toast.success("Student deleted successfully");
+        fetchStudents();
+      }
+    }
+  }
 
   return (
     <>
@@ -61,7 +117,7 @@ export default function Home() {
             <div className="card mb-4">
               <div className="card-body">
                 <form onSubmit={handleFormSubmit}>
-                <div className="mb-3">
+                  <div className="mb-3">
                     <label className="form-label">Id:</label>
                     <input
                       type="text"
@@ -134,7 +190,9 @@ export default function Home() {
                       <option value="other">Other</option>
                     </select>
                   </div>
-                  <button className="btn btn-primary w-100">Add</button>
+                  <button className="btn btn-primary w-100">
+                    {editId ? "Update" : "Add"}
+                  </button>
                 </form>
               </div>
             </div>
@@ -154,21 +212,32 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>Kavindu Eranga</td>
-                    <td>keranga297@gmail.com</td>
-                    <td>0766723151</td>
-                    <td>Male</td>
-                    <td>
-                      <button className="btn btn-warning btn-sm me-2">
-                        Edit
-                      </button>
-                      <button className="btn btn-danger btn-sm me-2">
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
+                  {students.map((singleStudent) => (
+                    <tr key={singleStudent.id}>
+                      <td>{singleStudent.id}</td>
+                      <td>{singleStudent.name}</td>
+                      <td>{singleStudent.email}</td>
+                      <td>{singleStudent.phone_number}</td>
+                      <td>{singleStudent.gender}</td>
+                      <td>
+                        <button
+                          className="btn btn-warning btn-sm me-2"
+                          onClick={() => handleStudentEdit(singleStudent)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm me-2"
+                          onClick={() =>
+                            singleStudent.id &&
+                            handleStudentDelete(singleStudent.id)
+                          }
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
