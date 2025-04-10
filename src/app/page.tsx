@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState, FormEvent } from "react";
-import { supabase } from "@/lib/supabase";
-import toast, { Toast } from "react-hot-toast";
+import { supabase } from "@/app/lib/supabase";
+import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+
 
 interface Student {
   id?: string;
@@ -12,42 +13,94 @@ interface Student {
   phone_number: string;
   gender: string;
 }
+
 export default function Home() {
-  const [students, setStudents] = useState<Student[]>([]);
+  const [students , setStudents] = useState<Student[]>([]);
   const [form, setForm] = useState<Student>({
     name: "",
     email: "",
     phone_number: "",
     gender: "Male",
   });
+  const [editId, setEditId] = useState<string | null>(null);
+
+  //Handle Form Submit
+  async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    console.log(form);
+    const { error } = await supabase.from<Student>("students").insert([form]);
+    if (error) {
+      toast.error(`Faild to create ${error.message}`);
+    } else {
+      toast.success("Student added successfully");
+    }
+  }
 
   return (
     <>
       {/*Student Management Form*/}
       <div className="container my-5">
+        <Toaster />
         <h3 className="mb-4">Student Management</h3>
         <div className="row">
           <div className="col-md-4">
             <div className="card mb-4">
               <div className="card-body">
-                <form>
+                <form onSubmit={handleFormSubmit}>
                   <div className="mb-3">
                     <label className="form-label">Name:</label>
-                    <input type="text" value={form.name} onChange={(event)=>setForm({
-                      ...form,name:event.target.value
-                    })} className="form-control"  />
+                    <input
+                      type="text"
+                      value={form.name}
+                      onChange={(event) =>
+                        setForm({
+                          ...form,
+                          name: event.target.value,
+                        })
+                      }
+                      className="form-control"
+                    />
                   </div>
                   <div className="mb-3">
                     <label>Email:</label>
-                    <input type="email" value={form.email} className="form-control"  />
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(event) =>
+                        setForm({
+                          ...form,
+                          email: event.target.value,
+                        })
+                      }
+                      className="form-control"
+                    />
                   </div>
                   <div className="mb-3">
                     <label>Phone Number:</label>
-                    <input type="text" value={form.phone_number} className="form-control"  />
+                    <input
+                      type="text"
+                      value={form.phone_number}
+                      onChange={(event) =>
+                        setForm({
+                          ...form,
+                          phone_number: event.target.value,
+                        })
+                      }
+                      className="form-control"
+                    />
                   </div>
                   <div className="mb-3">
                     <label>Gender:</label>
-                    <select className="form-select"value={form.gender }>
+                    <select
+                      className="form-select"
+                      value={form.gender}
+                      onChange={(event) =>
+                        setForm({
+                          ...form,
+                          gender: event.target.value,
+                        })
+                      }
+                    >
                       <option value="male">Male</option>
                       <option value="female">Female</option>
                       <option value="other">Other</option>
