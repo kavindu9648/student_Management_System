@@ -42,3 +42,5 @@ while($row=mysqli_fetch_array($res)){
 
 
 ?>
+
+<a href="search.html">Find A Student</a>
