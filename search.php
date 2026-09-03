@@ -1,6 +1,8 @@
 <?php
 //get Data From Html Page
-$sid=$_POST['sid'];
+//$sid=$_POST['sid'];
+$sid=$_GET['sid'];
+
 
 //Create Connection With Database
 include_once("db.php" );
@@ -43,14 +45,14 @@ while($row=mysqli_fetch_array($res)){
 ?>
 
 <!--Search Karala Delete Karanna Ona Data ME vidiyata Form Ekakata gannawa-->
- <form action="delete.php" method="post">
+ <form action="update.php" method="post">
         <p>Student Id :<input type="text" value="<?php if(isset($stuId)){echo $stuId;} ?>" name="Studentid"></p>
         <p>First Name :<input type="text" value="<?php if(isset( $stufn)){echo  $stufn;} ?>" name="Studentfname"></p>
         <p>Last Name :<input type="text" value="<?php if(isset($stuln)){echo $stuln;} ?>" name="Studentlname"></p>
         <p>Gender :<input type="text" value="<?php if(isset($stuGen)){echo $stuGen;} ?>" name="StudentGender"></p>
-        <p><input type="submit" value="Delete">
-          
+        <p><input type="button" value="Delete" onclick="window.location='delete.php?id=<?php if(isset($stuId)){echo $stuId;}?>';">
+          <input type="submit" value="Update">
         </p>
-    </form>
+    </form>   
 
     <a href="viewAll.php">View All Student</a>
