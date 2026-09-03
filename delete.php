@@ -1,6 +1,7 @@
 <?php
+$Studentid=$_GET['id'];
 //get data From search .php page form  
-$Studentid=$_POST['Studentid'];
+//$Studentid=$_POST['Studentid'];
 /*
 $Studentfname=$_POST['Studentfname'];
 $Studentlname=$_POST['Studentlname'];
@@ -11,12 +12,14 @@ include_once('db.php');
 
 $res=mysqli_query($connection,"delete from lamaya where stuId='$Studentid' ");
 if($res){
+     header("location:viewAll.php");
     /*
   echo "Successfulle Delete";
+ 
   */
-   header("location:viewAll.php");
+    
 }else{
-    echo "Delete Fail";
+ echo "Delete Fail";
 }
 
 ?>
