@@ -17,6 +17,7 @@ $res=mysqli_query($connection,$lam);
         <th>Student First Name</th>
         <th>Student Last Name</th>
         <th>Student Gender</th>
+        <th>Options</th>
     </tr>" ;
 
 while($row=mysqli_fetch_array($res)){
@@ -34,6 +35,7 @@ while($row=mysqli_fetch_array($res)){
         <td>".$row['stufn']."</td>
         <td>".$row['stuln']."</td>
         <td>".$row['stuGen']."</td>
+        <td><a href='search.php?sid=".$row['stuId']."'>View</a> |<a href='delete.php?id=".$row['stuId']."'>Delete</a></td>
     </tr>";
    
 }
